@@ -25,9 +25,10 @@ pub struct Pager {
 ///
 /// [`Pager`]: struct.Pager.html
 pub struct Page {
-  /// Byte offset for the start of the `Page` relative to all other `Page`s.
+  /// Byte offset for the start of the `Page` relative to all other `Page`
+  /// instances.
   pub offset: usize,
-  /// Buffer of size [`page_size`].
+  /// Buffer with capacity of size [`page_size`].
   ///
   /// [`page_size`]: struct.Pager.html#structfield.page_size
   pub buffer: Vec<u8>,
