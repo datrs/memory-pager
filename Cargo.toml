@@ -10,4 +10,4 @@ authors = ["datrs <yoshuawuyts@gmail.com>"]
 [dependencies]
 
 [dev-dependencies]
-clippy = "0.0.189"
+# clippy = "0.0.189"
