@@ -9,7 +9,8 @@
 //! extern crate memory_pager;
 //!
 //! let pager = memory_pager::Pager::new(1024);
-//! pager.set(0, )
+//! let page = pager.get(3);
+//! assert_eq!(page.buffer.len(), 1024);
 //! ```
 
 /// Memory pager instance. Manages [`Page`] instances.
@@ -20,7 +21,7 @@ pub struct Pager {
   /// The size of each page held in memory.
   pub page_size: usize,
   /// A vector of pages that are held in memory.
-  pub pages: Vec<Page>,
+  pub pages: Vec<Option<Page>>,
   length: usize,
 }
 
@@ -53,10 +54,14 @@ impl Pager {
   /// [`Pager`]: struct.Pager.html
   /// [`page_size`]: struct.Pager.html#structfield.page_size
   pub fn new(page_size: usize) -> Self {
+    let mut pages = Vec::with_capacity(16);
+    for _ in 0..16 {
+      pages.push(None);
+    }
     Pager {
       page_size: page_size,
       length: 0,
-      pages: Vec::with_capacity(1),
+      pages: pages,
     }
   }
 
@@ -66,9 +71,11 @@ impl Pager {
   /// [`Pager`]: struct.Pager.html
   /// [`page_size`]: struct.Pager.html#structfield.page_size
   /// [`pages`]: struct.Pager.html#structfield.pages
-  pub fn with_pages(page_size: usize, pages: Vec<Page>) -> Self {
+  pub fn with_pages(page_size: usize, pages: Vec<Option<Page>>) -> Self {
     for page in &pages {
-      assert_eq!(page.buffer.len(), page_size);
+      if let &Some(ref page) = page {
+        assert_eq!(page.buffer.len(), page_size);
+      }
     }
 
     Pager {
@@ -82,75 +89,43 @@ impl Pager {
   ///
   /// [`Page`]: struct.Page.html
   pub fn get(&mut self, page_num: usize) -> &Page {
-    if page_num >= self.pages.len() {
+    if page_num >= self.pages.capacity() {
       self.grow_pages(page_num);
     }
 
-    if let None = self.pages.get(page_num) {
+    // This should never be out of bounds.
+    if let None = self.pages[page_num] {
       let mut buf: Vec<u8> = Vec::with_capacity(self.page_size);
       for _ in 0..self.page_size {
         buf.push(0);
       }
       let page = Page::new(page_num, buf);
-      self.pages.insert(page_num, page)
+      self.pages.insert(page_num, Some(page));
     }
 
-    self.pages.get(page_num).unwrap()
+    self.pages[page_num].as_ref().unwrap()
   }
-
-  ///// Explicitely set a buffer for a [`Page`]. Useful to recreate pages that
-  ///// have been persisted to disk.
-  /////
-  ///// [`Page`]: struct.Page.html
-  //pub fn set(&mut self, index: usize, mut buf: Vec<u8>) {
-  //  if index >= self.pages.len() {
-  //    self.grow_pages(index);
-  //  }
-
-  //  if index >= self.length {
-  //    self.length = index + 1;
-  //  }
-
-  //  self.resize_buffer(&mut buf);
-
-  //  let page = self.pages.get_mut(index).unwrap();
-  //  panic!("not finished implementing");
-
-  //  // match  {
-  //  //   Some(ref mut page) => page.buffer = buf,
-  //  //   None => {
-  //  //     let page = Page::new(index, buf);
-  //  //     self.pages.insert(index, Some(page));
-  //  //   }
-  //  // }
-  //}
 
   /// Grow the page buffer capacity to accomodate more elements.
   fn grow_pages(&mut self, index: usize) {
-    let start_len = self.pages.len();
+    let start_len = self.pages.capacity();
     let mut nlen = start_len * 2;
+
+    // Guard against a page size of 0.
+    if nlen == 0 {
+      nlen += 1
+    }
+
     while nlen <= index {
       nlen *= 2;
     }
 
     self.pages.reserve_exact(nlen);
-  }
 
-  ///// Resize a single buffer to fit the page size. Can both grow and shrink.
-  /////
-  ///// NOTE(yw): Unlike the original `memory-pager` implementation, we do not
-  ///// zero out the memory, but instead rely on growing the capacity - and assume
-  ///// the acquired memory is zeroed out. This feels more rust-like, but we have
-  ///// to be careful that this won't lead to any bugs down the line.
-  //fn resize_buffer(&mut self, buf: &mut Vec<u8>) {
-  //  let buf_cap = buf.capacity();
-  //  let len = self.page_size;
-  //  if buf_cap > len {
-  //    buf.truncate(len);
-  //  } else if buf_cap < len {
-  //    buf.reserve_exact(len);
-  //  }
-  //}
+    for _ in start_len..nlen {
+      self.pages.push(None);
+    }
+  }
 }
 
 /// Create a new [`Pager`] instance with a [`page_size`] of `1024`.
