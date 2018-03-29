@@ -122,9 +122,9 @@ impl Pager {
   pub fn get(&mut self, page_num: usize) -> Option<&Page> {
     match self.pages.get(page_num) {
       None => None,
-      Some(page) => match *page {
+      Some(page) => match page.as_ref() {
         None => None,
-        Some(ref page) => Some(page),
+        Some(page) => Some(page),
       },
     }
   }
@@ -136,9 +136,9 @@ impl Pager {
   pub fn get_mut(&mut self, page_num: usize) -> Option<&mut Page> {
     match self.pages.get_mut(page_num) {
       None => None,
-      Some(page) => match *page {
+      Some(page) => match page.as_mut() {
         None => None,
-        Some(ref mut page) => Some(page),
+        Some(page) => Some(page),
       },
     }
   }
