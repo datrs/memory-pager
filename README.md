@@ -8,7 +8,7 @@ Access memory using small fixed size buffers. Adapted from
 - [Documentation][8]
 - [Crate][2]
 
-## Example
+## Usage
 ```rust
 extern crate memory_pager;
 
