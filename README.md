@@ -9,11 +9,11 @@ Access memory using small fixed size buffers. Adapted from
 - [Crate][2]
 
 ## Example
-```rust,ignore
+```rust
 extern crate memory_pager;
 
-let pager = memory_pager::Pager::new(1024);
-let page = pager.get(3);
+let mut pager = memory_pager::Pager::new(1024);
+let page = pager.get_mut_or_alloc(3);
 assert_eq!(page.len(), 1024);
 ```
 
