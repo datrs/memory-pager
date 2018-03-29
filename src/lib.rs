@@ -1,4 +1,4 @@
-// #![deny(warnings, missing_docs)]
+#![deny(missing_docs)]
 // #![cfg_attr(test, feature(plugin))]
 // #![cfg_attr(test, plugin(clippy))]
 
@@ -49,6 +49,8 @@ impl Page {
     }
   }
 
+  /// Byte offset for the start of the `Page` relative to all other `Page`
+  /// instances.
   pub fn offset(&self) -> usize {
     self.offset
   }
@@ -107,7 +109,7 @@ impl Pager {
   /// Get a [`Page`]. The page will be allocated on first access.
   ///
   /// [`Page`]: struct.Page.html
-  pub fn get(&mut self, page_num: usize) -> &Page {
+  pub fn access(&mut self, page_num: usize) -> &Page {
     if page_num >= self.pages.capacity() {
       self.grow_pages(page_num);
     }
@@ -122,10 +124,10 @@ impl Pager {
     self.pages[page_num].as_ref().unwrap()
   }
 
-  /// Get a [`Page`]. The page will be allocated on first access.
+  /// Get a [`Page`] mutably. The page will be allocated on first access.
   ///
   /// [`Page`]: struct.Page.html
-  pub fn get_mut(&mut self, page_num: usize) -> &mut Page {
+  pub fn access_mut(&mut self, page_num: usize) -> &mut Page {
     if page_num >= self.pages.capacity() {
       self.grow_pages(page_num);
     }
@@ -141,6 +143,33 @@ impl Pager {
     }
 
     self.pages[page_num].as_mut().unwrap()
+  }
+
+  /// Get a [`Page`] wrapped in an `Option` enum. Does not allocate on access.
+  ///
+  /// [`Page`]: struct.Page.html
+  pub fn get(&mut self, page_num: usize) -> Option<&Page> {
+    match self.pages.get(page_num) {
+      None => None,
+      Some(page) => match page {
+        &None => None,
+        &Some(ref page) => Some(page),
+      },
+    }
+  }
+
+  /// Get a mutable [`Page`] wrapped in an `Option` enum. Does not allocate on
+  /// access.
+  ///
+  /// [`Page`]: struct.Page.html
+  pub fn get_mut(&mut self, page_num: usize) -> Option<&mut Page> {
+    match self.pages.get_mut(page_num) {
+      None => None,
+      Some(page) => match page {
+        &mut None => None,
+        &mut Some(ref mut page) => Some(page),
+      },
+    }
   }
 
   /// Grow the page buffer capacity to accomodate more elements.
@@ -171,6 +200,7 @@ impl Pager {
     self.length
   }
 
+  /// check whether the `length` is zero.
   pub fn is_empty(&self) -> bool {
     self.length == 0
   }
