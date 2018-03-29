@@ -8,6 +8,15 @@ Access memory using small fixed size buffers. Adapted from
 - [Documentation][8]
 - [Crate][2]
 
+## Example
+```rust,ignore
+extern crate memory_pager;
+
+let pager = memory_pager::Pager::new(1024);
+let page = pager.get(3);
+assert_eq!(page.len(), 1024);
+```
+
 ## Installation
 ```sh
 $ cargo add memory-pager

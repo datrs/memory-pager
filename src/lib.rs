@@ -1,17 +1,6 @@
 #![deny(missing_docs)]
-// #![cfg_attr(test, feature(plugin))]
-// #![cfg_attr(test, plugin(clippy))]
-
-//! Access memory using small fixed size buffers. Adapted from
-//! [mafintosh/memory-pager](https://github.com/mafintosh/memory-pager).
-//!
-//! ```rust,ignore
-//! extern crate memory_pager;
-//!
-//! let pager = memory_pager::Pager::new(1024);
-//! let page = pager.get(3);
-//! assert_eq!(page.len(), 1024);
-//! ```
+#![feature(external_doc)]
+#![doc(include = "../README.md")]
 
 use std::ops::{Deref, DerefMut};
 
@@ -106,28 +95,10 @@ impl Pager {
     }
   }
 
-  /// Get a [`Page`]. The page will be allocated on first access.
-  ///
-  /// [`Page`]: struct.Page.html
-  pub fn get(&mut self, page_num: usize) -> &Page {
-    if page_num >= self.pages.capacity() {
-      self.grow_pages(page_num);
-    }
-
-    // This should never be out of bounds.
-    if self.pages[page_num].is_none() {
-      let buf = vec![0; self.page_size];
-      let page = Page::new(page_num, buf);
-      self.pages.insert(page_num, Some(page));
-    }
-
-    self.pages[page_num].as_ref().unwrap()
-  }
-
   /// Get a [`Page`] mutably. The page will be allocated on first access.
   ///
   /// [`Page`]: struct.Page.html
-  pub fn get_mut(&mut self, page_num: usize) -> &mut Page {
+  pub fn get_mut_or_alloc(&mut self, page_num: usize) -> &mut Page {
     if page_num >= self.pages.capacity() {
       self.grow_pages(page_num);
     }
@@ -148,7 +119,7 @@ impl Pager {
   /// Get a [`Page`] wrapped in an `Option` enum. Does not allocate on access.
   ///
   /// [`Page`]: struct.Page.html
-  pub fn access(&mut self, page_num: usize) -> Option<&Page> {
+  pub fn get(&mut self, page_num: usize) -> Option<&Page> {
     match self.pages.get(page_num) {
       None => None,
       Some(page) => match page {
@@ -162,7 +133,7 @@ impl Pager {
   /// access.
   ///
   /// [`Page`]: struct.Page.html
-  pub fn access_mut(&mut self, page_num: usize) -> Option<&mut Page> {
+  pub fn get_mut(&mut self, page_num: usize) -> Option<&mut Page> {
     match self.pages.get_mut(page_num) {
       None => None,
       Some(page) => match page {

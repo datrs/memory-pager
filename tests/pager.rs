@@ -16,12 +16,12 @@ fn can_create_with_size() {
 fn can_get() {
   let mut pager = Pager::default();
   {
-    let page = pager.get(0);
+    let page = pager.get_mut_or_alloc(0);
     assert_eq!(page.len(), 1024);
   }
 
   {
-    let page = pager.get(3);
+    let page = pager.get_mut_or_alloc(3);
     assert_eq!(page.len(), 1024);
   }
 }
@@ -30,12 +30,12 @@ fn can_get() {
 fn can_alloc() {
   let mut pager = Pager::default();
   {
-    let page = &pager.get(16);
+    let page = &pager.get_mut_or_alloc(16);
     assert_eq!(page.len(), 1024);
   }
 
   {
-    let page = &pager.get(32);
+    let page = &pager.get_mut_or_alloc(32);
     assert_eq!(page.len(), 1024);
   }
 }
@@ -43,7 +43,7 @@ fn can_alloc() {
 #[test]
 fn can_write() {
   let mut pager = Pager::default();
-  let page = pager.get_mut(0);
+  let page = pager.get_mut_or_alloc(0);
   page[0] = 1;
 
   assert_eq!(1, page[0]);
@@ -53,7 +53,7 @@ fn can_write() {
 #[test]
 fn can_check_offset() {
   let mut pager = Pager::default();
-  let page = pager.get(1);
+  let page = pager.get_mut_or_alloc(1);
 
   assert_eq!(1024, page.offset());
 }
@@ -61,7 +61,7 @@ fn can_check_offset() {
 #[test]
 fn can_access_nodes() {
   let pager = &mut Pager::default();
-  assert!(pager.access(0).is_none());
-  pager.get(0);
-  assert!(pager.access(0).is_some());
+  assert!(pager.get(0).is_none());
+  pager.get_mut_or_alloc(0);
+  assert!(pager.get(0).is_some());
 }
