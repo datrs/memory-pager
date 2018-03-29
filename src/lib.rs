@@ -10,8 +10,10 @@
 //!
 //! let pager = memory_pager::Pager::new(1024);
 //! let page = pager.get(3);
-//! assert_eq!(page.buffer.len(), 1024);
+//! assert_eq!(page.len(), 1024);
 //! ```
+
+use std::ops::{Deref, DerefMut};
 
 /// Memory pager instance. Manages [`Page`] instances.
 ///
@@ -32,11 +34,11 @@ pub struct Pager {
 pub struct Page {
   /// Byte offset for the start of the `Page` relative to all other `Page`
   /// instances.
-  pub offset: usize,
+  offset: usize,
   /// Buffer with capacity of size [`page_size`].
   ///
   /// [`page_size`]: struct.Pager.html#structfield.page_size
-  pub buffer: Vec<u8>,
+  buffer: Vec<u8>,
 }
 
 impl Page {
@@ -46,6 +48,23 @@ impl Page {
       buffer: buf,
     }
   }
+
+  pub fn offset(&self) -> usize {
+      self.offset
+  }
+}
+
+impl Deref for Page {
+    type Target = [u8];
+    fn deref(&self) -> &Self::Target {
+        &self.buffer
+    }
+}
+
+impl DerefMut for Page {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.buffer
+    }
 }
 
 impl Pager {
@@ -74,7 +93,7 @@ impl Pager {
   pub fn with_pages(page_size: usize, pages: Vec<Option<Page>>) -> Self {
     for page in &pages {
       if let &Some(ref page) = page {
-        assert_eq!(page.buffer.len(), page_size);
+        assert_eq!(page.len(), page_size);
       }
     }
 
@@ -104,6 +123,27 @@ impl Pager {
     }
 
     self.pages[page_num].as_ref().unwrap()
+  }
+
+  /// Get a [`Page`]. The page will be allocated on first access.
+  ///
+  /// [`Page`]: struct.Page.html
+  pub fn get_mut(&mut self, page_num: usize) -> &mut Page {
+    if page_num >= self.pages.capacity() {
+      self.grow_pages(page_num);
+    }
+
+    // This should never be out of bounds.
+    if let None = self.pages[page_num] {
+      let mut buf: Vec<u8> = Vec::with_capacity(self.page_size);
+      for _ in 0..self.page_size {
+        buf.push(0);
+      }
+      let page = Page::new(page_num, buf);
+      self.pages.insert(page_num, Some(page));
+    }
+
+    self.pages[page_num].as_mut().unwrap()
   }
 
   /// Grow the page buffer capacity to accomodate more elements.
