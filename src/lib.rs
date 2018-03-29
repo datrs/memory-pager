@@ -48,6 +48,10 @@ impl Page {
       buffer: buf,
     }
   }
+
+  pub fn offset(&self) -> usize {
+      self.offset
+  }
 }
 
 impl Deref for Page {

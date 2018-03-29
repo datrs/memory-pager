@@ -49,3 +49,11 @@ fn can_write() {
   assert_eq!(1, page[0]);
   assert_eq!(0, page[1]);
 }
+
+#[test]
+fn can_check_offset() {
+  let mut pager = Pager::default();
+  let page = pager.get(1);
+
+  assert_eq!(1024, page.offset());
+}
