@@ -17,7 +17,7 @@ $ cargo add memory-pager
 [Apache-2.0](./LICENSE)
 
 [1]: https://img.shields.io/crates/v/memory-pager.svg?style=flat-square
-[2]: https://crates.io/crate/memory-pager
+[2]: https://crates.io/crates/memory-pager
 [3]: https://img.shields.io/travis/datrs/memory-pager.svg?style=flat-square
 [4]: https://travis-ci.org/datrs/memory-pager
 [5]: https://img.shields.io/crates/d/memory-pager.svg?style=flat-square
