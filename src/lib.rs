@@ -78,9 +78,9 @@ impl Pager {
       pages.push(None);
     }
     Pager {
-      page_size: page_size,
+      page_size,
       length: 0,
-      pages: pages,
+      pages,
     }
   }
 
@@ -92,15 +92,15 @@ impl Pager {
   /// [`pages`]: struct.Pager.html#structfield.pages
   pub fn with_pages(page_size: usize, pages: Vec<Option<Page>>) -> Self {
     for page in &pages {
-      if let &Some(ref page) = page {
+      if let Some(ref page) = *page {
         assert_eq!(page.len(), page_size);
       }
     }
 
     Pager {
-      page_size: page_size,
+      page_size,
       length: pages.len(),
-      pages: pages,
+      pages,
     }
   }
 
@@ -113,8 +113,8 @@ impl Pager {
     }
 
     // This should never be out of bounds.
-    if let None = self.pages[page_num] {
-      let mut buf = vec![0; self.page_size];
+    if self.pages[page_num].is_none() {
+      let buf = vec![0; self.page_size];
       let page = Page::new(page_num, buf);
       self.pages.insert(page_num, Some(page));
     }
@@ -131,7 +131,7 @@ impl Pager {
     }
 
     // This should never be out of bounds.
-    if let None = self.pages[page_num] {
+    if self.pages[page_num].is_none() {
       let mut buf: Vec<u8> = Vec::with_capacity(self.page_size);
       for _ in 0..self.page_size {
         buf.push(0);
@@ -169,6 +169,10 @@ impl Pager {
   /// purposes.
   pub fn len(&self) -> usize {
     self.length
+  }
+
+  pub fn is_empty(&self) -> bool {
+    self.length == 0
   }
 }
 
