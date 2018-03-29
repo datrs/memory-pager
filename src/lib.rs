@@ -95,10 +95,7 @@ impl Pager {
 
     // This should never be out of bounds.
     if let None = self.pages[page_num] {
-      let mut buf: Vec<u8> = Vec::with_capacity(self.page_size);
-      for _ in 0..self.page_size {
-        buf.push(0);
-      }
+      let mut buf = vec![0; self.page_size];
       let page = Page::new(page_num, buf);
       self.pages.insert(page_num, Some(page));
     }
