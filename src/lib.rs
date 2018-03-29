@@ -109,7 +109,7 @@ impl Pager {
   /// Get a [`Page`]. The page will be allocated on first access.
   ///
   /// [`Page`]: struct.Page.html
-  pub fn access(&mut self, page_num: usize) -> &Page {
+  pub fn get(&mut self, page_num: usize) -> &Page {
     if page_num >= self.pages.capacity() {
       self.grow_pages(page_num);
     }
@@ -127,7 +127,7 @@ impl Pager {
   /// Get a [`Page`] mutably. The page will be allocated on first access.
   ///
   /// [`Page`]: struct.Page.html
-  pub fn access_mut(&mut self, page_num: usize) -> &mut Page {
+  pub fn get_mut(&mut self, page_num: usize) -> &mut Page {
     if page_num >= self.pages.capacity() {
       self.grow_pages(page_num);
     }
@@ -148,7 +148,7 @@ impl Pager {
   /// Get a [`Page`] wrapped in an `Option` enum. Does not allocate on access.
   ///
   /// [`Page`]: struct.Page.html
-  pub fn get(&mut self, page_num: usize) -> Option<&Page> {
+  pub fn access(&mut self, page_num: usize) -> Option<&Page> {
     match self.pages.get(page_num) {
       None => None,
       Some(page) => match page {
@@ -162,7 +162,7 @@ impl Pager {
   /// access.
   ///
   /// [`Page`]: struct.Page.html
-  pub fn get_mut(&mut self, page_num: usize) -> Option<&mut Page> {
+  pub fn access_mut(&mut self, page_num: usize) -> Option<&mut Page> {
     match self.pages.get_mut(page_num) {
       None => None,
       Some(page) => match page {
