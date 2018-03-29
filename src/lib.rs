@@ -50,21 +50,21 @@ impl Page {
   }
 
   pub fn offset(&self) -> usize {
-      self.offset
+    self.offset
   }
 }
 
 impl Deref for Page {
-    type Target = [u8];
-    fn deref(&self) -> &Self::Target {
-        &self.buffer
-    }
+  type Target = [u8];
+  fn deref(&self) -> &Self::Target {
+    &self.buffer
+  }
 }
 
 impl DerefMut for Page {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.buffer
-    }
+  fn deref_mut(&mut self) -> &mut Self::Target {
+    &mut self.buffer
+  }
 }
 
 impl Pager {
@@ -162,6 +162,13 @@ impl Pager {
     for _ in start_len..nlen {
       self.pages.push(None);
     }
+  }
+
+  /// Return the highest index number for the Pages held. Not exactly the
+  /// "length" in the classical sence, but the same for all intents and
+  /// purposes.
+  pub fn len(&self) -> usize {
+    self.length
   }
 }
 
