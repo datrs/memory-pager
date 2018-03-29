@@ -57,3 +57,11 @@ fn can_check_offset() {
 
   assert_eq!(1024, page.offset());
 }
+
+#[test]
+fn can_access_nodes() {
+  let pager = &mut Pager::default();
+  assert!(pager.access(0).is_none());
+  pager.get(0);
+  assert!(pager.access(0).is_some());
+}
