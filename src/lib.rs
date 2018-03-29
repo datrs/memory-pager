@@ -19,7 +19,7 @@ pub struct Pager {
 /// Memory pages returned by [`Pager`].
 ///
 /// [`Pager`]: struct.Pager.html
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Page {
   /// Byte offset for the start of the `Page` relative to all other `Page`
   /// instances.
@@ -64,14 +64,10 @@ impl Pager {
   /// [`Pager`]: struct.Pager.html
   /// [`page_size`]: struct.Pager.html#structfield.page_size
   pub fn new(page_size: usize) -> Self {
-    let mut pages = Vec::with_capacity(16);
-    for _ in 0..16 {
-      pages.push(None);
-    }
     Pager {
       page_size,
       length: 0,
-      pages,
+      pages: vec![None; 16],
     }
   }
 
@@ -105,10 +101,7 @@ impl Pager {
 
     // This should never be out of bounds.
     if self.pages[page_num].is_none() {
-      let mut buf: Vec<u8> = Vec::with_capacity(self.page_size);
-      for _ in 0..self.page_size {
-        buf.push(0);
-      }
+      let buf = vec![0; self.page_size];
       let page = Page::new(page_num, buf);
       self.pages.insert(page_num, Some(page));
     }
@@ -146,22 +139,18 @@ impl Pager {
   /// Grow the page buffer capacity to accomodate more elements.
   fn grow_pages(&mut self, index: usize) {
     let start_len = self.pages.capacity();
-    let mut nlen = start_len * 2;
+    let mut new_len = start_len * 2;
 
     // Guard against a page size of 0.
-    if nlen == 0 {
-      nlen += 1
+    if new_len == 0 {
+      new_len += 1
     }
 
-    while nlen <= index {
-      nlen *= 2;
+    while new_len <= index {
+      new_len *= 2;
     }
 
-    self.pages.reserve_exact(nlen);
-
-    for _ in start_len..nlen {
-      self.pages.push(None);
-    }
+    self.pages.resize(new_len, None);
   }
 
   /// Return the highest index number for the Pages held. Not exactly the

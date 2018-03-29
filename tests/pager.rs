@@ -65,3 +65,9 @@ fn can_access_nodes() {
   pager.get_mut_or_alloc(0);
   assert!(pager.get(0).is_some());
 }
+
+#[test]
+fn set_122() {
+  let pager = &mut Pager::default();
+  pager.get_mut_or_alloc(122);
+}
