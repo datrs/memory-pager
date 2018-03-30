@@ -1,7 +1,7 @@
 [package]
 name = "memory-pager"
 version = "0.4.5-alpha.0"
-license = "Apache-2.0"
+license = "MIT OR Apache-2.0"
 repository = "https://github.com/datrs/memory-pager"
 documentation = "https://docs.rs/memory-pager"
 description = "Access memory using small fixed size buffers"

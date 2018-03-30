@@ -23,7 +23,7 @@ $ cargo add memory-pager
 ```
 
 ## License
-[Apache-2.0](./LICENSE)
+[MIT](./LICENSE-MIT) OR [Apache-2.0](./LICENSE-APACHE)
 
 [1]: https://img.shields.io/crates/v/memory-pager.svg?style=flat-square
 [2]: https://crates.io/crates/memory-pager
