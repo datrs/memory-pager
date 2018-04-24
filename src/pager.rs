@@ -60,6 +60,10 @@ impl Pager {
       self.pages.insert(page_num, Some(page));
     }
 
+    if page_num > self.length {
+      self.length = page_num + 1;
+    }
+
     self.pages[page_num].as_mut().unwrap()
   }
 
@@ -107,9 +111,8 @@ impl Pager {
     self.pages.resize(new_len, None);
   }
 
-  /// Return the highest index number for the Pages held. Not exactly the
-  /// "length" in the classical sence, but the same for all intents and
-  /// purposes.
+  /// The number of pages held by `memory-pager`. Doesn't account for empty
+  /// entries. Comparable to `vec.len()` in usage.
   pub fn len(&self) -> usize {
     self.length
   }
