@@ -49,7 +49,7 @@ impl Pager {
   ///
   /// [`Page`]: struct.Page.html
   pub fn get_mut_or_alloc(&mut self, page_num: usize) -> &mut Page {
-    if page_num >= self.pages.capacity() {
+    if page_num >= self.pages.len() {
       self.grow_pages(page_num);
     }
 
@@ -57,7 +57,11 @@ impl Pager {
     if self.pages[page_num].is_none() {
       let buf = vec![0; self.page_size];
       let page = Page::new(page_num, buf);
-      self.pages.insert(page_num, Some(page));
+      self.pages[page_num] = Some(page);
+    }
+
+    if page_num > self.length {
+      self.length = page_num + 1;
     }
 
     self.pages[page_num].as_mut().unwrap()
@@ -92,7 +96,7 @@ impl Pager {
 
   /// Grow the page buffer capacity to accomodate more elements.
   fn grow_pages(&mut self, index: usize) {
-    let start_len = self.pages.capacity();
+    let start_len = self.pages.len();
     let mut new_len = start_len * 2;
 
     // Guard against a page size of 0.
@@ -107,9 +111,8 @@ impl Pager {
     self.pages.resize(new_len, None);
   }
 
-  /// Return the highest index number for the Pages held. Not exactly the
-  /// "length" in the classical sence, but the same for all intents and
-  /// purposes.
+  /// The number of pages held by `memory-pager`. Doesn't account for empty
+  /// entries. Comparable to `vec.len()` in usage.
   pub fn len(&self) -> usize {
     self.length
   }
