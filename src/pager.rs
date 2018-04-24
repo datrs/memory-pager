@@ -57,7 +57,7 @@ impl Pager {
     if self.pages[page_num].is_none() {
       let buf = vec![0; self.page_size];
       let page = Page::new(page_num, buf);
-      self.pages.insert(page_num, Some(page));
+      self.pages[page_num] = Some(page);
     }
 
     if page_num > self.length {

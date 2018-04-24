@@ -41,9 +41,13 @@ quickcheck!{
         Get { index } => {
           let page = pager.get(index);
           if model[index] {
-            assert!(page.is_some());
+            if !page.is_some() {
+              return false;
+            }
           } else {
-            assert!(!page.is_some());
+            if !page.is_none() {
+              return false;
+            }
           }
         }
       }
