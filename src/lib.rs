@@ -2,8 +2,8 @@
 #![feature(external_doc)]
 #![doc(include = "../README.md")]
 
-mod pager;
 mod page;
+mod pager;
 
-pub use pager::*;
 pub use page::*;
+pub use pager::*;
