@@ -49,7 +49,7 @@ impl Pager {
   ///
   /// [`Page`]: struct.Page.html
   pub fn get_mut_or_alloc(&mut self, page_num: usize) -> &mut Page {
-    if page_num >= self.pages.capacity() {
+    if page_num >= self.pages.len() {
       self.grow_pages(page_num);
     }
 
@@ -96,7 +96,7 @@ impl Pager {
 
   /// Grow the page buffer capacity to accomodate more elements.
   fn grow_pages(&mut self, index: usize) {
-    let start_len = self.pages.capacity();
+    let start_len = self.pages.len();
     let mut new_len = start_len * 2;
 
     // Guard against a page size of 0.
