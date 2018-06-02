@@ -73,10 +73,7 @@ impl Pager {
   pub fn get(&mut self, page_num: usize) -> Option<&Page> {
     match self.pages.get(page_num) {
       None => None,
-      Some(page) => match page.as_ref() {
-        None => None,
-        Some(page) => Some(page),
-      },
+      Some(page) => page.as_ref(),
     }
   }
 
@@ -87,10 +84,7 @@ impl Pager {
   pub fn get_mut(&mut self, page_num: usize) -> Option<&mut Page> {
     match self.pages.get_mut(page_num) {
       None => None,
-      Some(page) => match page.as_mut() {
-        None => None,
-        Some(page) => Some(page),
-      },
+      Some(page) => page.as_mut(),
     }
   }
 
@@ -113,13 +107,15 @@ impl Pager {
 
   /// The number of pages held by `memory-pager`. Doesn't account for empty
   /// entries. Comparable to `vec.len()` in usage.
+  #[inline]
   pub fn len(&self) -> usize {
     self.length
   }
 
   /// check whether the `length` is zero.
+  #[inline]
   pub fn is_empty(&self) -> bool {
-    self.length == 0
+    self.len() == 0
   }
 }
 
