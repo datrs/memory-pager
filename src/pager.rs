@@ -1,4 +1,5 @@
 use super::*;
+use std::{borrow, iter};
 
 /// Memory pager instance. Manages [`Page`] instances.
 ///
@@ -10,6 +11,8 @@ pub struct Pager {
   /// A vector of pages that are held in memory.
   pub pages: Vec<Option<Page>>,
   length: usize,
+  /// Position in the iterator.
+  cursor: usize,
 }
 
 impl Pager {
@@ -21,6 +24,7 @@ impl Pager {
     Pager {
       page_size,
       length: 0,
+      cursor: 0,
       pages: vec![None; 16],
     }
   }
@@ -39,6 +43,7 @@ impl Pager {
     }
 
     Pager {
+      cursor: 0,
       page_size,
       length: pages.len(),
       pages,
@@ -126,5 +131,27 @@ impl Pager {
 impl Default for Pager {
   fn default() -> Self {
     Pager::new(1024)
+  }
+}
+
+impl iter::Iterator for Pager {
+  type Item = Option<borrow::Cow<Page>>;
+
+  fn next(&mut self) -> Option<Self::Item> {
+    let cursor = self.cursor;
+    self.cursor += 1;
+
+    if cursor >= self.length {
+      None
+    } else {
+      match self.pages.get(cursor) {
+        Some(page) => Some(borrow::Cow::Borrowed(page)),
+        None => None,
+      }
+    }
+  }
+
+  fn size_hint(&self) -> (usize, Option<usize>) {
+    (0, Some(self.len()))
   }
 }
