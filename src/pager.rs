@@ -134,24 +134,23 @@ impl Default for Pager {
   }
 }
 
-impl iter::Iterator for Pager {
-  type Item = Option<borrow::Cow<Page>>;
+// TODO: return a new struct that holds a lifetime so we can iterate over it.
+// The API should probably become `.iter()` which returns an iterator.
+impl<'a> iter::Iterator for Pager {
+  type Item = &'a Option<Page>;
 
-  fn next(&mut self) -> Option<Self::Item> {
+  fn next(&mut self) -> Option<&Self::Item> {
     let cursor = self.cursor;
     self.cursor += 1;
 
     if cursor >= self.length {
       None
     } else {
-      match self.pages.get(cursor) {
-        Some(page) => Some(borrow::Cow::Borrowed(page)),
-        None => None,
-      }
+      self.pages.get(cursor)
     }
   }
 
-  fn size_hint(&self) -> (usize, Option<usize>) {
-    (0, Some(self.len()))
-  }
+  // fn size_hint(&self) -> (usize, Option<usize>) {
+  //   (0, Some(self.len()))
+  // }
 }
