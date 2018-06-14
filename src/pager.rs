@@ -157,8 +157,6 @@ pub struct Iter<'a> {
   cursor: usize,
 }
 
-// TODO: return a new struct that holds a lifetime so we can iterate over it.
-// The API should probably become `.iter()` which returns an iterator.
 impl<'a> iter::Iterator for Iter<'a> {
   type Item = &'a Option<Page>;
 

@@ -97,3 +97,20 @@ fn can_iterate_over_pager() {
     }
   }
 }
+
+#[test]
+fn can_iterate_over_pages() {
+  let mut pager = Pager::default();
+  pager.get_mut_or_alloc(0);
+
+  for page in pager.iter() {
+    match page {
+      None => panic!("Index 0 should contain a page"),
+      Some(page) => {
+        for num in page.iter() {
+          assert_eq!(*num, 0);
+        }
+      }
+    }
+  }
+}
