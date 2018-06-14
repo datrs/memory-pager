@@ -1,5 +1,5 @@
-use std::iter;
 use super::{Page, Pager};
+use std::iter;
 
 /// Iterator over a `Pager` instance.
 ///

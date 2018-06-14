@@ -3,8 +3,8 @@
 #![cfg_attr(feature = "nightly", doc(include = "../README.md"))]
 #![cfg_attr(test, deny(warnings))]
 
-mod page;
 mod iter;
+mod page;
 
 pub use iter::Iter;
 pub use page::Page;
