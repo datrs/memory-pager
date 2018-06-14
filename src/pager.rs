@@ -139,6 +139,19 @@ impl Default for Pager {
 }
 
 /// Iterator over a `Pager` instance.
+///
+/// ```rust
+/// # extern crate memory_pager;
+/// # use memory_pager::Pager;
+/// let mut pager = Pager::default();
+/// pager.get_mut_or_alloc(1);
+/// pager.get_mut_or_alloc(2);
+/// pager.get_mut_or_alloc(3);
+///
+/// for page in pager.iter() {
+///   println!("page {:?}", page);
+/// }
+/// ```
 pub struct Iter<'a> {
   inner: &'a Pager,
   cursor: usize,
