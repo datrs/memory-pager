@@ -71,7 +71,7 @@ impl Pager {
   /// Get a [`Page`] wrapped in an `Option` enum. Does not allocate on access.
   ///
   /// [`Page`]: struct.Page.html
-  pub fn get(&mut self, page_num: usize) -> Option<&Page> {
+  pub fn get(&self, page_num: usize) -> Option<&Page> {
     match self.pages.get(page_num) {
       None => None,
       Some(page) => page.as_ref(),
