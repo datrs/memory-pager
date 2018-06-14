@@ -1,4 +1,5 @@
 use super::*;
+use std::iter;
 
 /// Memory pager instance. Manages [`Page`] instances.
 ///
@@ -73,10 +74,7 @@ impl Pager {
   pub fn get(&mut self, page_num: usize) -> Option<&Page> {
     match self.pages.get(page_num) {
       None => None,
-      Some(page) => match page.as_ref() {
-        None => None,
-        Some(page) => Some(page),
-      },
+      Some(page) => page.as_ref(),
     }
   }
 
@@ -87,10 +85,7 @@ impl Pager {
   pub fn get_mut(&mut self, page_num: usize) -> Option<&mut Page> {
     match self.pages.get_mut(page_num) {
       None => None,
-      Some(page) => match page.as_mut() {
-        None => None,
-        Some(page) => Some(page),
-      },
+      Some(page) => page.as_mut(),
     }
   }
 
@@ -113,13 +108,23 @@ impl Pager {
 
   /// The number of pages held by `memory-pager`. Doesn't account for empty
   /// entries. Comparable to `vec.len()` in usage.
+  #[inline]
   pub fn len(&self) -> usize {
     self.length
   }
 
   /// check whether the `length` is zero.
+  #[inline]
   pub fn is_empty(&self) -> bool {
-    self.length == 0
+    self.len() == 0
+  }
+
+  /// Iterate over `&Pages`.
+  pub fn iter(&self) -> Iter {
+    Iter {
+      inner: &self,
+      cursor: 0,
+    }
   }
 }
 
@@ -130,5 +135,39 @@ impl Pager {
 impl Default for Pager {
   fn default() -> Self {
     Pager::new(1024)
+  }
+}
+
+/// Iterator over a `Pager` instance.
+///
+/// ```rust
+/// # extern crate memory_pager;
+/// # use memory_pager::Pager;
+/// let mut pager = Pager::default();
+/// pager.get_mut_or_alloc(1);
+/// pager.get_mut_or_alloc(2);
+/// pager.get_mut_or_alloc(3);
+///
+/// for page in pager.iter() {
+///   println!("page {:?}", page);
+/// }
+/// ```
+pub struct Iter<'a> {
+  inner: &'a Pager,
+  cursor: usize,
+}
+
+impl<'a> iter::Iterator for Iter<'a> {
+  type Item = &'a Option<Page>;
+
+  fn next(&mut self) -> Option<Self::Item> {
+    let cursor = self.cursor;
+    self.cursor += 1;
+
+    if cursor >= self.inner.len() {
+      None
+    } else {
+      self.inner.pages.get(cursor)
+    }
   }
 }

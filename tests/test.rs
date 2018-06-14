@@ -81,3 +81,36 @@ fn set_122() {
   let pager = &mut Pager::default();
   pager.get_mut_or_alloc(122);
 }
+
+#[test]
+fn can_iterate_over_pager() {
+  let mut pager = Pager::default();
+  pager.get_mut_or_alloc(0);
+  pager.get_mut_or_alloc(2);
+
+  for (i, page) in pager.iter().enumerate() {
+    match i {
+      0 => assert!(page.is_some(), "0 is some"),
+      1 => assert!(page.is_none(), "1 is none"),
+      2 => assert!(page.is_some(), "2 is some"),
+      i => panic!("Index {} out of bounds", i),
+    }
+  }
+}
+
+#[test]
+fn can_iterate_over_pages() {
+  let mut pager = Pager::default();
+  pager.get_mut_or_alloc(0);
+
+  for page in pager.iter() {
+    match page {
+      None => panic!("Index 0 should contain a page"),
+      Some(page) => {
+        for num in page.iter() {
+          assert_eq!(*num, 0);
+        }
+      }
+    }
+  }
+}
