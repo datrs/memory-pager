@@ -6,11 +6,9 @@ use std::iter;
 /// [`Page`]: struct.Page.html
 #[derive(Debug)]
 pub struct Pager {
-  /// The size of each page held in memory.
-  pub page_size: usize,
-  /// A vector of pages that are held in memory.
-  pub pages: Vec<Option<Page>>,
+  pages: Vec<Option<Page>>,
   length: usize,
+  page_size: usize,
 }
 
 impl Pager {
@@ -117,6 +115,12 @@ impl Pager {
   #[inline]
   pub fn is_empty(&self) -> bool {
     self.len() == 0
+  }
+
+  /// Get the memory page size in bytes.
+  #[inline]
+  pub fn page_size(&self) -> usize {
+    self.page_size
   }
 
   /// Iterate over `&Pages`.
