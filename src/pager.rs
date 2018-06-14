@@ -1,5 +1,5 @@
 use super::*;
-use std::{borrow, iter};
+use std::iter;
 
 /// Memory pager instance. Manages [`Page`] instances.
 ///
@@ -11,8 +11,6 @@ pub struct Pager {
   /// A vector of pages that are held in memory.
   pub pages: Vec<Option<Page>>,
   length: usize,
-  /// Position in the iterator.
-  cursor: usize,
 }
 
 impl Pager {
@@ -24,7 +22,6 @@ impl Pager {
     Pager {
       page_size,
       length: 0,
-      cursor: 0,
       pages: vec![None; 16],
     }
   }
@@ -43,7 +40,6 @@ impl Pager {
     }
 
     Pager {
-      cursor: 0,
       page_size,
       length: pages.len(),
       pages,
@@ -122,6 +118,14 @@ impl Pager {
   pub fn is_empty(&self) -> bool {
     self.len() == 0
   }
+
+  /// Iterate over `&Pages`.
+  pub fn iter(&self) -> Iter {
+    Iter {
+      inner: &self,
+      cursor: 0,
+    }
+  }
 }
 
 /// Create a new [`Pager`] instance with a [`page_size`] of `1024`.
@@ -134,23 +138,25 @@ impl Default for Pager {
   }
 }
 
+/// Iterator over a `Pager` instance.
+pub struct Iter<'a> {
+  inner: &'a Pager,
+  cursor: usize,
+}
+
 // TODO: return a new struct that holds a lifetime so we can iterate over it.
 // The API should probably become `.iter()` which returns an iterator.
-impl<'a> iter::Iterator for Pager {
+impl<'a> iter::Iterator for Iter<'a> {
   type Item = &'a Option<Page>;
 
-  fn next(&mut self) -> Option<&Self::Item> {
+  fn next(&mut self) -> Option<Self::Item> {
     let cursor = self.cursor;
     self.cursor += 1;
 
-    if cursor >= self.length {
+    if cursor >= self.inner.len() {
       None
     } else {
-      self.pages.get(cursor)
+      self.inner.pages.get(cursor)
     }
   }
-
-  // fn size_hint(&self) -> (usize, Option<usize>) {
-  //   (0, Some(self.len()))
-  // }
 }
