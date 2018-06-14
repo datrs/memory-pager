@@ -89,7 +89,7 @@ impl Pager {
     }
   }
 
-  /// Grow the page buffer capacity to accomodate more elements.
+  /// Grow the page buffer capacity to accommodate more elements.
   fn grow_pages(&mut self, index: usize) {
     let start_len = self.pages.len();
     let mut new_len = start_len * 2;
