@@ -114,3 +114,24 @@ fn can_iterate_over_pages() {
     }
   }
 }
+
+#[test]
+fn length() {
+  let mut pager = Pager::new(1024);
+  assert_eq!(pager.len(), 0);
+
+  pager.get_mut_or_alloc(0);
+  assert_eq!(pager.len(), 1);
+
+  pager.get_mut_or_alloc(10);
+  assert_eq!(pager.len(), 11);
+
+  pager.get_mut_or_alloc(1536);
+  assert_eq!(pager.len(), 1537);
+
+  pager.get_mut_or_alloc(1537);
+  assert_eq!(pager.len(), 1538);
+
+  pager.get_mut_or_alloc(1536512);
+  assert_eq!(pager.len(), 1536513);
+}

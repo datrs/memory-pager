@@ -1,5 +1,5 @@
 use super::{Page, Pager};
-use std::iter;
+use std::{iter, slice};
 
 /// Iterator over a `Pager` instance.
 ///
@@ -16,16 +16,14 @@ use std::iter;
 /// }
 /// ```
 pub struct Iter<'a> {
-  inner: &'a Pager,
-  cursor: usize,
+  inner: slice::Iter<'a, Option<Page>>,
 }
 
 impl<'a> Iter<'a> {
   #[inline]
   pub(crate) fn new(pager: &'a Pager) -> Self {
     Self {
-      inner: pager,
-      cursor: 0,
+      inner: pager.pages.iter(),
     }
   }
 }
@@ -34,13 +32,6 @@ impl<'a> iter::Iterator for Iter<'a> {
   type Item = &'a Option<Page>;
 
   fn next(&mut self) -> Option<Self::Item> {
-    let cursor = self.cursor;
-    self.cursor += 1;
-
-    if cursor >= self.inner.len() {
-      None
-    } else {
-      self.inner.pages.get(cursor)
-    }
+    self.inner.next()
   }
 }

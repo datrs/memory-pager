@@ -15,7 +15,6 @@ pub use page::Page;
 #[derive(Debug)]
 pub struct Pager {
   pages: Vec<Option<Page>>,
-  length: usize,
   page_size: usize,
 }
 
@@ -27,8 +26,7 @@ impl Pager {
   pub fn new(page_size: usize) -> Self {
     Pager {
       page_size,
-      length: 0,
-      pages: vec![None; 16],
+      pages: Vec::new(),
     }
   }
 
@@ -48,11 +46,7 @@ impl Pager {
       }
     }
 
-    Pager {
-      length: pages.len(),
-      page_size,
-      pages,
-    }
+    Pager { page_size, pages }
   }
 
   /// Get a [`Page`] mutably. The page will be allocated on first access.
@@ -68,10 +62,6 @@ impl Pager {
       let buf = vec![0; self.page_size];
       let page = Page::new(page_num, buf);
       self.pages[page_num] = Some(page);
-    }
-
-    if page_num > self.length {
-      self.length = page_num + 1;
     }
 
     self.pages[page_num].as_mut().unwrap()
@@ -100,32 +90,20 @@ impl Pager {
 
   /// Grow the page buffer capacity to accommodate more elements.
   fn grow_pages(&mut self, index: usize) {
-    let start_len = self.pages.len();
-    let mut new_len = start_len * 2;
-
-    // Guard against a page size of 0.
-    if new_len == 0 {
-      new_len += 1
-    }
-
-    while new_len <= index {
-      new_len *= 2;
-    }
-
-    self.pages.resize(new_len, None);
+    self.pages.resize(index + 1, None);
   }
 
   /// The number of pages held by `memory-pager`. Doesn't account for empty
   /// entries. Comparable to `vec.len()` in usage.
   #[inline]
   pub fn len(&self) -> usize {
-    self.length
+    self.pages.len()
   }
 
   /// check whether the `length` is zero.
   #[inline]
   pub fn is_empty(&self) -> bool {
-    self.len() == 0
+    self.pages.is_empty()
   }
 
   /// Get the memory page size in bytes.
