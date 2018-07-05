@@ -65,16 +65,16 @@ impl Pager {
   /// use std::fs;
   ///
   /// fn main () -> Result<(), Error> {
-  ///   let page_size = 1024;
-  ///   let mut file = fs::File::open("file")?;
-  ///   let _pager = Pager::from_file(page_size, &mut file, None)?;
+  ///   let mut file = fs::File::open("tests/fixtures/40_empty.memory_page")?;
+  ///   let page_size = 10;
+  ///   let _pager = Pager::from_file(&mut file, page_size, None)?;
   ///   Ok(())
   /// }
   /// ```
   #[inline]
   pub fn from_file(
-    page_size: usize,
     file: &mut File,
+    page_size: usize,
     offset: Option<usize>,
   ) -> Result<Self, Error> {
     let offset = offset.unwrap_or(0);
@@ -131,10 +131,7 @@ impl Pager {
   /// [`Page`]: struct.Page.html
   #[inline]
   pub fn get(&self, page_num: usize) -> Option<&Page> {
-    match self.pages.get(page_num) {
-      None => None,
-      Some(page) => page.as_ref(),
-    }
+    self.pages.get(page_num).and_then(|page| page.as_ref())
   }
 
   /// Get a mutable [`Page`] wrapped in an `Option` enum. Does not allocate on
@@ -143,10 +140,7 @@ impl Pager {
   /// [`Page`]: struct.Page.html
   #[inline]
   pub fn get_mut(&mut self, page_num: usize) -> Option<&mut Page> {
-    match self.pages.get_mut(page_num) {
-      None => None,
-      Some(page) => page.as_mut(),
-    }
+    self.pages.get_mut(page_num).and_then(|page| page.as_mut())
   }
 
   /// Grow the page buffer capacity to accommodate more elements.
