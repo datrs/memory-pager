@@ -141,12 +141,27 @@ fn length() {
 
 #[test]
 fn can_recreate_from_file() -> Result<(), Error> {
-  let mut file = fs::File::open("./tests/fixtures/40_empty.memory_page")?;
   let page_size = 10;
-  let pager = Pager::from_file(&mut file, page_size, None)?;
 
-  for page in pager.iter() {
-    assert!(page.is_none());
+  let mut file = fs::File::open("./tests/fixtures/40_empty.bin")?;
+  let pager = Pager::from_file(&mut file, page_size, None)?;
+  for (index, page) in pager.iter().enumerate() {
+    assert!(page.is_none(), "page {:?} failed, was {:?}", index, page);
   }
+
+  let mut file = fs::File::open("./tests/fixtures/40_first_block.bin")?;
+  let pager = Pager::from_file(&mut file, page_size, None)?;
+  assert!(pager.get(0).is_some());
+  assert!(pager.get(1).is_none());
+  assert!(pager.get(3).is_none());
+  assert!(pager.get(8).is_none());
+
+  let mut file = fs::File::open("./tests/fixtures/40_last_block.bin")?;
+  let pager = Pager::from_file(&mut file, page_size, None)?;
+  assert!(pager.get(0).is_none());
+  assert!(pager.get(1).is_none());
+  assert!(pager.get(3).is_some());
+  assert!(pager.get(8).is_none());
+
   Ok(())
 }

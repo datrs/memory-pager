@@ -65,7 +65,7 @@ impl Pager {
   /// use std::fs;
   ///
   /// fn main () -> Result<(), Error> {
-  ///   let mut file = fs::File::open("tests/fixtures/40_empty.memory_page")?;
+  ///   let mut file = fs::File::open("tests/fixtures/40_empty.bin")?;
   ///   let page_size = 10;
   ///   let _pager = Pager::from_file(&mut file, page_size, None)?;
   ///   Ok(())
@@ -90,10 +90,15 @@ impl Pager {
 
     let page_count = len / page_size;
     let mut pages = Vec::with_capacity(page_count);
-    let mut buf = Vec::with_capacity(page_size);
+    let mut buf = vec![0; page_size];
 
     for index in 0..page_count {
-      file.read_exact(&mut buf)?;
+      let bytes_read = file.read(&mut buf)?;
+
+      // This should already be guarded for, but making extra extra sure.
+      if bytes_read < page_size {
+        break;
+      }
 
       // The buffer is reused if it only contains zeroes.
       if is_zeroed(&buf) {
