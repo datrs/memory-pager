@@ -3,11 +3,17 @@
 #![cfg_attr(feature = "nightly", doc(include = "../README.md"))]
 #![cfg_attr(test, deny(warnings))]
 
+#[macro_use]
+extern crate failure;
+
 mod iter;
 mod page;
 
 pub use iter::Iter;
 pub use page::Page;
+
+use failure::Error;
+use std::fs::File;
 
 /// Memory pager instance. Manages [`Page`] instances.
 ///
@@ -39,7 +45,7 @@ impl Pager {
   /// [`Pager`]: struct.Pager.html
   /// [`page_size`]: struct.Pager.html#structfield.page_size
   /// [`pages`]: struct.Pager.html#structfield.pages
-  pub fn with_pages(page_size: usize, pages: Vec<Option<Page>>) -> Self {
+  pub fn from_pages(page_size: usize, pages: Vec<Option<Page>>) -> Self {
     for page in &pages {
       if let Some(ref page) = *page {
         assert_eq!(page.len(), page_size);
@@ -47,6 +53,55 @@ impl Pager {
     }
 
     Pager { page_size, pages }
+  }
+
+  /// Create a new instance from a reader.
+  ///
+  /// This is particularly useful when restoring the `memory-pager` from disk,
+  /// as it's possible to open a file, and directly convert it into a pager
+  /// instance.
+  ///
+  /// ## Options
+  /// The third argument is an optional offset of `usize`. This is useful to
+  /// ignore the first few bytes if the file has a header that isn't part of the
+  /// bitfield's body.
+  ///
+  /// ## Errors
+  /// This method will fail if the `File` length is not a multiple of
+  /// `page_size`.
+  ///
+  /// ## Example
+  /// ```rust
+  /// # extern crate memory_pager as pager;
+  /// use pager::Pager;
+  /// use std::fs;
+  ///
+  /// fn main () -> std::io::Result<()> {
+  ///   let page_size = 1024;
+  ///   let mut file = fs::File::open("file")?;
+  ///   let _pager = Pager::from_reader(&file, page_size, None)?;
+  /// }
+  /// ```
+  pub fn from_file(
+    page_size: usize,
+    file: &File,
+    offset: Option<usize>,
+  ) -> Result<Self, Error> {
+    let mut index = 0;
+    let offset = offset.unwrap_or(0);
+    let len = file.metadata()?.len() as usize - offset;
+
+    ensure!(
+      len % page_size == 0,
+      format!(
+        "<memory-pager>: Reader len ({}) is not a multiple of {}",
+        len, page_size
+      )
+    );
+
+    // let top =
+    // for
+    unimplemented!();
   }
 
   /// Get a [`Page`] mutably. The page will be allocated on first access.

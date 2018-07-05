@@ -9,6 +9,7 @@ authors = ["datrs <yoshuawuyts@gmail.com>"]
 readme = "README.md"
 
 [dependencies]
+failure = "0.1.1"
 
 [dev-dependencies]
 quickcheck = "0.6.2"
