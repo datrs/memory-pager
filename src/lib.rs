@@ -38,51 +38,37 @@ impl Pager {
     }
   }
 
-  /// Create a new [`Pager`] instance with a [`page_size`] and [`pages`]. Useful
-  /// to restore a [`Pager`] instance from disk.
-  ///
-  /// ## Panics
-  /// Each page that's passed in `pages` must be the same length as `page size`.
-  ///
-  /// [`Pager`]: struct.Pager.html
-  /// [`page_size`]: struct.Pager.html#structfield.page_size
-  /// [`pages`]: struct.Pager.html#structfield.pages
-  #[inline]
-  pub fn from_pages(page_size: usize, pages: Vec<Option<Page>>) -> Self {
-    for page in &pages {
-      if let Some(ref page) = *page {
-        assert_eq!(page.len(), page_size);
-      }
-    }
-
-    Self { page_size, pages }
-  }
-
   /// Create a new instance from a reader.
   ///
   /// This is particularly useful when restoring the `memory-pager` from disk,
   /// as it's possible to open a file, and directly convert it into a pager
   /// instance.
   ///
-  /// ## Options
-  /// The third argument is an optional offset of `usize`. This is useful to
+  /// # Options
+  ///
+  /// The third argument is an optional `offset` of `usize`. This is useful to
   /// ignore the first few bytes if the file has a header that isn't part of the
   /// bitfield's body.
   ///
-  /// ## Errors
-  /// This method will fail if the `File` length is not a multiple of
-  /// `page_size`.
+  /// # Errors
   ///
-  /// ## Example
+  /// This method will return an error if the `File` length is not a multiple of
+  /// `page_size`. It can also fail if it's unable to read the file's metadata.
+  ///
+  /// # Examples
+  ///
   /// ```rust
   /// # extern crate memory_pager as pager;
+  /// # extern crate failure;
+  /// use failure::Error;
   /// use pager::Pager;
   /// use std::fs;
   ///
-  /// fn main () -> std::io::Result<()> {
+  /// fn main () -> Result<(), Error> {
   ///   let page_size = 1024;
   ///   let mut file = fs::File::open("file")?;
-  ///   let _pager = Pager::from_reader(&file, page_size, None)?;
+  ///   let _pager = Pager::from_file(page_size, &mut file, None)?;
+  ///   Ok(())
   /// }
   /// ```
   #[inline]
