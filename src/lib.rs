@@ -38,7 +38,7 @@ impl Pager {
     }
   }
 
-  /// Create a new instance from a reader.
+  /// Create a new instance from a file.
   ///
   /// This is particularly useful when restoring the `memory-pager` from disk,
   /// as it's possible to open a file, and directly convert it into a pager
