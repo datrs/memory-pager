@@ -1,6 +1,9 @@
+extern crate failure;
 extern crate memory_pager;
 
+use failure::Error;
 use memory_pager::Pager;
+use std::fs;
 
 #[test]
 fn can_create_default() {
@@ -134,4 +137,31 @@ fn length() {
 
   pager.get_mut_or_alloc(1536512);
   assert_eq!(pager.len(), 1536513);
+}
+
+#[test]
+fn can_recreate_from_file() -> Result<(), Error> {
+  let page_size = 10;
+
+  let mut file = fs::File::open("./tests/fixtures/40_empty.bin")?;
+  let pager = Pager::from_file(&mut file, page_size, None)?;
+  for (index, page) in pager.iter().enumerate() {
+    assert!(page.is_none(), "page {:?} failed, was {:?}", index, page);
+  }
+
+  let mut file = fs::File::open("./tests/fixtures/40_first_block.bin")?;
+  let pager = Pager::from_file(&mut file, page_size, None)?;
+  assert!(pager.get(0).is_some());
+  assert!(pager.get(1).is_none());
+  assert!(pager.get(3).is_none());
+  assert!(pager.get(8).is_none());
+
+  let mut file = fs::File::open("./tests/fixtures/40_last_block.bin")?;
+  let pager = Pager::from_file(&mut file, page_size, None)?;
+  assert!(pager.get(0).is_none());
+  assert!(pager.get(1).is_none());
+  assert!(pager.get(3).is_some());
+  assert!(pager.get(8).is_none());
+
+  Ok(())
 }

@@ -15,9 +15,10 @@ pub struct Page {
 }
 
 impl Page {
-  pub(crate) fn new(i: usize, buf: Vec<u8>) -> Self {
+  /// Create a new instance.
+  pub fn new(index: usize, buf: Vec<u8>) -> Self {
     Page {
-      offset: i * buf.capacity(),
+      offset: index * buf.capacity(),
       buffer: buf,
     }
   }
