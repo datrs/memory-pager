@@ -105,7 +105,7 @@ impl Pager {
         pages.push(None);
       } else {
         pages.push(Some(Page::new(index, buf)));
-        buf = Vec::with_capacity(page_size);
+        buf = vec![0; page_size];
       }
     }
 
