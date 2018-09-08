@@ -168,7 +168,7 @@ fn can_recreate_from_file() -> Result<(), Error> {
   assert!(pager.get(0).is_some());
   assert!(pager.get(1).is_some());
   assert!(pager.get(2).is_some());
-  assert!(pager.get(3).is_some());   
+  assert!(pager.get(3).is_some());
 
-  Ok(()) 
+  Ok(())
 }
