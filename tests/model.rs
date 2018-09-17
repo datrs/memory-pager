@@ -1,10 +1,12 @@
 #[macro_use]
 extern crate quickcheck;
 extern crate memory_pager;
+extern crate rand;
 
 use self::Operation::*;
 use memory_pager::Pager;
 use quickcheck::{Arbitrary, Gen};
+use rand::Rng;
 
 const MAX_LENGTH: usize = 50;
 const PAGE_LEN: usize = 10;
