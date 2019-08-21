@@ -1,6 +1,3 @@
-extern crate failure;
-extern crate memory_pager;
-
 use failure::Error;
 use memory_pager::Pager;
 use std::fs;

@@ -1,11 +1,6 @@
-#[macro_use]
-extern crate quickcheck;
-extern crate memory_pager;
-extern crate rand;
-
 use self::Operation::*;
 use memory_pager::Pager;
-use quickcheck::{Arbitrary, Gen};
+use quickcheck::{quickcheck, Arbitrary, Gen};
 use rand::Rng;
 
 const MAX_LENGTH: usize = 50;
@@ -29,7 +24,7 @@ impl Arbitrary for Operation {
   }
 }
 
-quickcheck!{
+quickcheck! {
   fn implementation_matches_model(ops: Vec<Operation>) -> bool{
     let mut pager = Pager::new(PAGE_LEN);
     let mut model = vec![false; MAX_LENGTH];

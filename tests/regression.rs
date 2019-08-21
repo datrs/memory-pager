@@ -1,5 +1,3 @@
-extern crate memory_pager;
-
 use memory_pager::Pager;
 
 // Postmortem: we were growing pages based on capacity, not on length. This
