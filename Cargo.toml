@@ -7,11 +7,11 @@ documentation = "https://docs.rs/memory-pager"
 description = "Access memory using small fixed size buffers"
 authors = ["datrs <yoshuawuyts@gmail.com>"]
 readme = "README.md"
+edition = "2018"
 
 [dependencies]
-failure = "0.1.1"
+failure = "0.1.5"
 
 [dev-dependencies]
-quickcheck = "0.7.1"
-rand = "0.6.0"
-# clippy = "0.0.189"
+quickcheck = "0.8.5"
+rand = "0.6.5"

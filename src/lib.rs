@@ -3,16 +3,13 @@
 #![cfg_attr(feature = "nightly", doc(include = "../README.md"))]
 #![cfg_attr(test, deny(warnings))]
 
-#[macro_use]
-extern crate failure;
-
 mod iter;
 mod page;
 
-pub use iter::Iter;
-pub use page::Page;
+pub use crate::iter::Iter;
+pub use crate::page::Page;
 
-use failure::Error;
+use failure::{ensure, Error};
 use std::fs::File;
 use std::io::Read;
 
@@ -175,7 +172,7 @@ impl Pager {
 
   /// Iterate over `&Pages`.
   #[inline]
-  pub fn iter(&self) -> Iter {
+  pub fn iter(&self) -> Iter<'_> {
     Iter::new(self)
   }
 }
