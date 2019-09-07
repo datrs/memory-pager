@@ -10,7 +10,6 @@ readme = "README.md"
 edition = "2018"
 
 [dependencies]
-failure = "0.1.5"
 
 [dev-dependencies]
 quickcheck = "0.8.5"

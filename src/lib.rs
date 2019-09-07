@@ -9,8 +9,8 @@ mod page;
 pub use crate::iter::Iter;
 pub use crate::page::Page;
 
-use failure::{ensure, Error};
 use std::fs::File;
+use std::io;
 use std::io::Read;
 
 /// Memory pager instance. Manages [`Page`] instances.
@@ -73,17 +73,19 @@ impl Pager {
     file: &mut File,
     page_size: usize,
     offset: Option<usize>,
-  ) -> Result<Self, Error> {
+  ) -> Result<Self, io::Error> {
     let offset = offset.unwrap_or(0);
     let len = file.metadata()?.len() as usize - offset;
 
-    ensure!(
-      len % page_size == 0,
-      format!(
-        "<memory-pager>: Reader len ({}) is not a multiple of {}",
-        len, page_size
-      )
-    );
+    if len % page_size != 0 {
+      return Err(io::Error::new(
+        io::ErrorKind::Other,
+        format!(
+          "<memory-pager>: Reader len ({}) is not a multiple of {}",
+          len, page_size
+        ),
+      ));
+    }
 
     let page_count = len / page_size;
     let mut pages = Vec::with_capacity(page_count);
